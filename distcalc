@@ -1,0 +1,96 @@
+LEVENSHTEIN DISTANCE
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+int levenshteinDistance(const string &s1, const string &s2) {
+    int m = s1.length(), n = s2.length();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+
+    for (int i = 0; i <= m; i++) dp[i][0] = i;
+    for (int j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+            dp[i][j] = min(dp[i - 1][j] + 1,
+                           min(dp[i][j - 1] + 1,
+                               dp[i - 1][j - 1] + cost));
+        }
+    }
+
+    return dp[m][n];
+}
+
+int main() {
+    string s1 = "crimson", s2 = "drought";
+    const int repetitions = 100000; // Number of times to repeat for accurate timing
+    int result = 0;
+
+    auto start = high_resolution_clock::now();
+
+    for (int i = 0; i < repetitions; ++i) {
+        result = levenshteinDistance(s1, s2);
+    }
+
+    auto stop = high_resolution_clock::now();
+    auto total_duration = duration_cast<nanoseconds>(stop - start);
+    double avg_time = static_cast<double>(total_duration.count()) / repetitions;
+
+    cout << "Levenshtein Distance: " << result << endl;
+    cout << "Total Time for " << repetitions << " executions: "
+         << total_duration.count() << " nanoseconds" << endl;
+    cout << "Average Execution Time: " << avg_time << " nanoseconds" << endl;
+
+    return 0;
+}
+
+
+HAMMING DISTANCE 
+
+#include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+int hammingDistance(const string &s1, const string &s2) {
+    if (s1.length() != s2.length()) {
+        cerr << "Error: Strings must be of equal length!" << endl;
+        return -1;
+    }
+
+    int distance = 0;
+    for (size_t i = 0; i < s1.length(); i++) {
+        if (s1[i] != s2[i]) distance++;
+    }
+    return distance;
+}
+
+int main() {
+    string s1 = "crimson", s2 = "drought";
+    const int repetitions = 100000;  // More reps = better timing accuracy
+    int result = 0;
+
+    auto start = high_resolution_clock::now();
+
+    for (int i = 0; i < repetitions; ++i) {
+        result = hammingDistance(s1, s2);
+    }
+
+    auto stop = high_resolution_clock::now();
+    auto total_duration = duration_cast<nanoseconds>(stop - start);
+    double avg_time = static_cast<double>(total_duration.count()) / repetitions;
+
+    cout << "Hamming Distance: " << result << endl;
+    cout << "Total Time for " << repetitions << " executions: "
+         << total_duration.count() << " nanoseconds" << endl;
+    cout << "Average Execution Time: " << avg_time << " nanoseconds" << endl;
+
+    return 0;
+}
